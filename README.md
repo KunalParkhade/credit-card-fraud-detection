@@ -1,162 +1,93 @@
-<html>
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Credit Card Fraud Detection using Spectral Clustering</title>
-    <style>
-        body {
-            font-family: 'Arial', sans-serif;
-            background-color: #f4f4f9;
-            color: #333;
-            margin: 0;
-            padding: 20px;
-        }
-        h1, h2 {
-            color: #2c3e50;
-            text-align: center;
-            font-weight: bold;
-            animation: fadeIn 2s ease-in;
-        }
-        h1 {
-            font-size: 3em;
-        }
-        h2 {
-            font-size: 2em;
-        }
+# Credit Card Fraud Detection using Sepctral Clustering
 
-        p {
-            line-height: 1.6;
-        }
+## Overview
 
-        .container {
-            width: 80%;
-            margin: 0 auto;
-            padding: 20px;
-            background-color: #fff;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            animation: slideUp 1s ease-out;
-        }
+This project addresses the challenge of detecting fraudulent credit card transactions by utilizing advanced clustering techniques, specifically **Laplacian Eigen Decomposition** and **K-Means Clustering**. The goal is to identify anomalous transactions (outliers) that may indicate fraud based on their behavior compared to non-fraudulent ones.
 
-        .feature-box {
-            margin: 20px 0;
-            padding: 15px;
-            background-color: #ecf0f1;
-            border-left: 5px solid #3498db;
-            animation: fadeInUp 1.5s ease;
-        }
+## Dataset
 
-        .feature-box:hover {
-            transform: scale(1.02);
-            transition: transform 0.2s ease;
-        }
+The dataset contains a variety of transaction-related features, including flags for declined transactions, foreign transactions, and transactions from high-risk countries. The main objective is to classify each transaction as either **fraudulent** or **non-fraudulent**.
 
-        .button {
-            display: inline-block;
-            margin: 20px auto;
-            padding: 10px 30px;
-            background-color: #3498db;
-            color: #fff;
-            border: none;
-            border-radius: 5px;
-            text-align: center;
-            font-size: 1.2em;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-        }
+### Key Features:
+- **Is declined**: Indicates if the transaction was declined (`Y` or `N`).
+- **isForeignTransaction**: Indicates if the transaction was foreign (`Y` or `N`).
+- **isHighRiskCountry**: Indicates if the transaction originated from a high-risk country (`Y` or `N`).
+- **isFradulent**: Binary target variable indicating whether the transaction was fraudulent (`Y` or `N`).
 
-        .button:hover {
-            background-color: #2980b9;
-        }
+### Preprocessing
+- Categorical features were converted into binary format (`1` for `Y`, `0` for `N`).
+- Irrelevant columns like `Merchant_id` and `Transaction date` were removed.
+- Feature scaling was applied using **MinMaxScaler** to normalize the data for clustering.
 
-        /* Animations */
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
+## Methodology
 
-        @keyframes slideUp {
-            from { transform: translateY(20px); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
-        }
+### 1. **Laplacian Eigen Decomposition**
 
-        @keyframes fadeInUp {
-            from { opacity: 0; transform: translateY(30px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <h1>Credit Card Fraud Detection</h1>
-        <h2>Overview</h2>
-        <p>This project utilizes clustering techniques such as <strong>Laplacian Eigen Decomposition</strong> and <strong>K-Means Clustering</strong> to identify fraudulent credit card transactions. The objective is to detect anomalies within the data that signify potential fraud.</p>
+This method helps in dimensionality reduction while preserving the relationships between the data points in the feature space. The steps include:
+- Constructing a **similarity matrix** using an RBF kernel.
+- Calculating the **degree matrix** and the **graph Laplacian**.
+- Performing **eigenvalue decomposition** to obtain the eigenvectors, which represent the data points in a lower-dimensional space.
 
-        <div class="feature-box">
-            <h2>Dataset</h2>
-            <p>The dataset contains key transaction features, such as:</p>
-            <ul>
-                <li><strong>Is declined:</strong> Whether the transaction was declined.</li>
-                <li><strong>isForeignTransaction:</strong> Whether the transaction was foreign.</li>
-                <li><strong>isHighRiskCountry:</strong> Whether the transaction was from a high-risk country.</li>
-                <li><strong>isFradulent:</strong> The label indicating if the transaction is fraudulent.</li>
-            </ul>
-        </div>
+### 2. **K-Means Clustering**
 
-        <div class="feature-box">
-            <h2>Methodology</h2>
-            <p>Our approach involves:</p>
-            <ol>
-                <li>Preprocessing the dataset (handling categorical variables and scaling features).</li>
-                <li>Applying <strong>Laplacian Eigen Decomposition</strong> for dimensionality reduction.</li>
-                <li>Clustering the data using <strong>K-Means</strong>.</li>
-                <li>Detecting outliers using z-scores, where high z-scores indicate potential fraudulent transactions.</li>
-            </ol>
-        </div>
+After obtaining the top `K` eigenvectors, the data is clustered into distinct groups. Each cluster is then analyzed to detect anomalies using z-scores:
+- Each point's **z-score** indicates how far it is from the cluster mean.
+- Transactions with high z-scores (above a threshold) are classified as potential fraudulent transactions.
 
-        <div class="feature-box">
-            <h2>Performance Metrics</h2>
-            <p>The model performance is evaluated using:</p>
-            <ul>
-                <li><strong>Precision: 0.85</strong> How many detected frauds are actual frauds.</li>
-                <li><strong>Recall: 0.81</strong> How many actual frauds were detected.</li>
-                <li><strong>F1 Score: 0.83</strong> The harmonic mean of precision and recall.</li>
-            </ul>
-        </div>
+### 3. **Fraud Detection Using Z-Scores**
 
-        <div class="feature-box">
-            <h2>Results</h2>
-            <p>The results include various visualizations:</p>
-            <ul>
-                <li>Feature distribution histograms.</li>
-                <li>Cluster visualization showing data separation.</li>
-                <li>Confusion matrix to analyze model predictions.</li>
-            </ul>
-        </div>
+- Fraud detection is refined by using z-scores to highlight outliers in each cluster.
+- These outliers are considered suspicious and flagged as potentially fraudulent.
 
-        <div class="feature-box">
-            <h2>Installation</h2>
-            <p>Follow these steps to run the project:</p>
-            <ol>
-                <li>Clone the repository:
-                    <pre><code>git clone https://github.com/KunalParkhade/credit-card-fraud-detection.git</code></pre>
-                </li>
-                <li>Install the dependencies:
-                    <pre><code>pip install -r requirements.txt</code></pre>
-                </li>
-            </ol>
-        </div>
+## Model Performance
 
-        <div class="feature-box">
-            <h2>Future Improvements</h2>
-            <p>Future enhancements could include:</p>
-            <ul>
-                <li>Adding more complex features such as transaction history.</li>
-                <li>Experimenting with other clustering techniques like DBSCAN.</li>
-                <li>Improving the z-score thresholding for better fraud detection.</li>
-            </ul>
-        </div>
+Performance is evaluated using standard classification metrics:
+- **Precision**: Measures how many detected frauds were actually frauds.
+- **Recall**: Measures how many actual frauds were detected.
+- **F1 Score**: Harmonic mean of precision and recall, giving a balanced view of model performance.
 
-        <a class="button" href="https://github.com/KunalParkhade/credit-card-fraud-detection" target="_blank">View on GitHub</a>
-    </div>
-</body>
-</html>
+### Confusion Matrix
+
+A confusion matrix is used to visually analyze the true positives, true negatives, false positives, and false negatives for fraud detection.
+
+## Results
+
+- **F1 Score**: `0.83`
+- **Precision**: `0.85`
+- **Recall**: `0.81`
+
+The results are visualized using various plots, including:
+- **Eigenvalue distribution**: Helps determine the optimal number of clusters.
+- **Cluster visualization**: Shows the separation between detected clusters.
+- **Confusion Matrix**: Offers insights into the classification performance.
+
+## Visualizations
+
+- **Feature Distributions**: Histograms show the distribution of key features in the dataset.
+- **Clustering Results**: Scatter plot of clusters in the lower-dimensional space.
+- **Confusion Matrix**: Provides a clear breakdown of predicted vs actual labels.
+
+## Installation
+
+To run this project locally:
+
+1. Clone the repository:
+    ```bash
+    git clone https://github.com/KunalParkhade/credit-card-fraud-detection.git
+    ```
+
+2. Install the required dependencies:
+    ```bash
+    pip install -r requirements.txt
+    ```
+
+## Future Work
+
+Potential enhancements to improve model performance include:
+- Incorporating additional features such as transaction history or user behavior patterns.
+- Experimenting with other clustering techniques such as **DBSCAN** or **Spectral Clustering**.
+- Fine-tuning the z-score threshold for more precise fraud detection.
+
+## Conclusion
+
+This project demonstrates the effectiveness of **Laplacian Eigen Decomposition** and **K-Means Clustering** for fraud detection. By identifying clusters and outliers, we can flag suspicious transactions for further investigation, providing a robust method for identifying fraud in credit card transactions.
