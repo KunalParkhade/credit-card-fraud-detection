@@ -1,4 +1,4 @@
-# Credit Card Fraud Detection using using Spectral Clustering
+# Credit Card Fraud Detection using Spectral Clustering
 
 ## Overview
 
