@@ -1,4 +1,4 @@
-<html lang="en">
+<html>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -11,18 +11,15 @@
             margin: 0;
             padding: 20px;
         }
-
         h1, h2 {
             color: #2c3e50;
             text-align: center;
             font-weight: bold;
             animation: fadeIn 2s ease-in;
         }
-
         h1 {
             font-size: 3em;
         }
-
         h2 {
             font-size: 2em;
         }
